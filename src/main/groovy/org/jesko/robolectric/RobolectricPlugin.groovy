@@ -7,7 +7,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
@@ -38,9 +37,9 @@ class RobolectricPlugin implements Plugin<Project> {
         JavaPluginConvention javaPlugin = project.getConvention().getPlugin(JavaPluginConvention)
         SourceSet robolectric = javaPlugin.getSourceSets().findByName("robolectric");
 
-        BasePlugin androidPlugin = project.getPlugins().getPlugin(AppPlugin) as BasePlugin
+        def androidPlugin = project.getPlugins().getPlugin(AppPlugin)
         if(androidPlugin == null) {
-            androidPlugin = project.getPlugins().getPlugin(LibraryPlugin) as BasePlugin
+            androidPlugin = project.getPlugins().getPlugin(LibraryPlugin)
         }
 
         androidPlugin.mainSourceSet.java.srcDirs.each { dir ->
