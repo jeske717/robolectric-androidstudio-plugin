@@ -3,10 +3,13 @@ package org.jesko.robolectric
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
+import javax.inject.Inject
+
 class TestSourceImlWriter extends DefaultTask {
 
     final ImlTestEntryTransformer imlTestEntryTransformer
 
+    @Inject
     TestSourceImlWriter() {
         this(new ImlTestEntryTransformer())
     }
