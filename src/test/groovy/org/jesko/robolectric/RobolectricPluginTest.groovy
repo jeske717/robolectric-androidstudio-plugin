@@ -4,6 +4,8 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.SourceSet
 import org.gradle.testfixtures.ProjectBuilder
 
 class RobolectricPluginTest extends GroovyTestCase {
@@ -45,5 +47,45 @@ class RobolectricPluginTest extends GroovyTestCase {
         project.apply plugin: RobolectricPlugin
 
         assertTrue(project.getPlugins().hasPlugin(JavaBasePlugin.class))
+    }
+
+    void testRobolectricTestIsSetAsASourceFolder() {
+        Project project = ProjectBuilder.builder().build()
+
+        project.apply plugin: AppPlugin
+        project.apply plugin: RobolectricPlugin
+
+        SourceSet robolectricSourceSet = project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().findByName("robolectric")
+        Iterator<File> srcDirIterator = robolectricSourceSet.getJava().srcDirs.iterator()
+        assertEquals(project.file("src/robolectric/java"), srcDirIterator.next())
+        assertEquals(project.file("src/robolectricTest/java"), srcDirIterator.next())
+    }
+
+    void testRobolectricExtensionIsAdded() {
+        Project project = ProjectBuilder.builder().build()
+        project.apply plugin: AppPlugin
+
+        project.apply plugin: RobolectricPlugin
+
+        RobolectricPluginExtension extension = project.extensions.findByType(RobolectricPluginExtension)
+        assertEquals(extension, project.extensions.findByName("robolectric"))
+    }
+
+    void testAddRobolectricTestSourcesToImlTaskIsAdded() {
+        Project project = ProjectBuilder.builder().build()
+        project.apply plugin: AppPlugin
+
+        project.apply plugin: RobolectricPlugin
+
+        assertEquals(1, project.getTasksByName("addRobolectricTestSourcesToIml", false).size())
+    }
+
+    void testConfigureJUnitDefaultToUseRobolectricClasspathTaskIsAdded() {
+        Project project = ProjectBuilder.builder().build()
+        project.apply plugin: AppPlugin
+
+        project.apply plugin: RobolectricPlugin
+
+        assertEquals(1, project.getTasksByName("configureJUnitDefaultToUseRobolectricClasspath", false).size())
     }
 }

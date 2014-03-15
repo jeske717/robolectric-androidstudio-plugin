@@ -28,15 +28,19 @@ class RobolectricPlugin implements Plugin<Project> {
         project.afterEvaluate {
             setupDependencies(project)
         }
+
+        project.extensions.create("robolectric", RobolectricPluginExtension)
+        project.getTasks().create("addRobolectricTestSourcesToIml", TestSourceImlWriter)
+        project.getTasks().create("configureJUnitDefaultToUseRobolectricClasspath", JUnitReconfigurer)
     }
 
     private static void setupDependencies(Project project) {
-        JavaPluginConvention javaPlugin = project.getConvention().getPlugin(JavaPluginConvention.class)
+        JavaPluginConvention javaPlugin = project.getConvention().getPlugin(JavaPluginConvention)
         SourceSet robolectric = javaPlugin.getSourceSets().findByName("robolectric");
 
-        BasePlugin androidPlugin = project.getPlugins().getPlugin(AppPlugin.class) as BasePlugin
+        BasePlugin androidPlugin = project.getPlugins().getPlugin(AppPlugin) as BasePlugin
         if(androidPlugin == null) {
-            androidPlugin = project.getPlugins().getPlugin(LibraryPlugin.class) as BasePlugin
+            androidPlugin = project.getPlugins().getPlugin(LibraryPlugin) as BasePlugin
         }
 
         androidPlugin.mainSourceSet.java.srcDirs.each { dir ->
@@ -65,7 +69,7 @@ class RobolectricPlugin implements Plugin<Project> {
     }
 
     private static void setupTest(final Project project) {
-        JavaPluginConvention pluginConvention = project.getConvention().getPlugin(JavaPluginConvention.class)
+        JavaPluginConvention pluginConvention = project.getConvention().getPlugin(JavaPluginConvention)
         project.getTasks().withType(Test.class, new Action<Test>() {
             public void execute(final Test test) {
                 test.workingDir 'src/main'
@@ -89,7 +93,7 @@ class RobolectricPlugin implements Plugin<Project> {
             }
         });
 
-        Test test = project.getTasks().create("robolectricTest", Test.class);
+        Test test = project.getTasks().create("robolectricTest", Test);
         project.getTasks().getByName(JavaBasePlugin.CHECK_TASK_NAME).dependsOn(test);
         test.setDescription("Runs the unit tests using robolectric.");
         test.setGroup(JavaBasePlugin.VERIFICATION_GROUP);
@@ -99,7 +103,7 @@ class RobolectricPlugin implements Plugin<Project> {
     }
 
     private static void setupSourceSets(Project project) {
-        SourceSet robolectric = project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets().create("robolectric")
+        SourceSet robolectric = project.getConvention().getPlugin(JavaPluginConvention).getSourceSets().create("robolectric")
         robolectric.java.srcDir(project.file("src/robolectricTest/java"))
         robolectric.compileClasspath += project.configurations.robolectric
         robolectric.runtimeClasspath += robolectric.compileClasspath
@@ -112,7 +116,7 @@ class RobolectricPlugin implements Plugin<Project> {
     }
 
     private static void validateProject(Project project) {
-        if(!project.getPlugins().hasPlugin(AppPlugin.class) && !project.getPlugins().hasPlugin(LibraryPlugin.class)) {
+        if(!project.getPlugins().hasPlugin(AppPlugin) && !project.getPlugins().hasPlugin(LibraryPlugin)) {
             throw new IllegalArgumentException("Project must be either an android or android library project")
         }
     }
