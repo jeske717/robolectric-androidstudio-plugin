@@ -38,6 +38,7 @@ class WorkspaceTransformer {
         def runBeforeNode = junitConfiguration.method[0]
         if(runBeforeNode.find{ it.attributes()['run_configuration_name'] == configuration.name} == null) {
             new Node(runBeforeNode, 'option', [name: 'RunConfigurationTask', enabled: 'true', run_configuration_name: configuration.name, run_configuration_type: 'GradleRunConfiguration'])
+            new Node(runBeforeNode, 'option', [name: 'Make', enabled: 'true'])
         }
 
         return XmlUtil.writeXmlToString(parsedXml)

@@ -38,6 +38,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
 
         assertTrue(result.contains('<option name="VM_PARAMETERS" value="-ea -classpath &quot;file1' + File.pathSeparator + 'file2' + File.pathSeparator + '$APPLICATION_HOME_DIR$/lib/idea_rt.jar' + File.pathSeparator + '$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-rt.jar&quot;"/>'));
         assertTrue(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration"/>'));
+        assertTrue(result.contains('<option name="Make" enabled="true"/>'));
     }
 
     void testCreateWorkspaceWithJUnitDoesNotCreateDuplicateRunConfigurations() {
@@ -46,7 +47,9 @@ class WorkspaceTransformerTest extends GroovyTestCase {
         String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]))
 
         assertTrue(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration" previous="true"/>'));
+        assertTrue(result.contains('<option name="Make" enabled="false"/>'));
         assertFalse(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration"/>'));
+        assertFalse(result.contains('<option name="Make" enabled="true"/>'));
     }
 
     static String getWorkspaceXml() {
@@ -134,6 +137,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
                     <patterns />
                     <method>
                         <option name="RunConfigurationTask" enabled="true" run_configuration_name="$runConfigName" run_configuration_type="GradleRunConfiguration" previous="true"/>
+                        <option name="Make" enabled="false"/>
                     </method>
                 </configuration>
             </component>
