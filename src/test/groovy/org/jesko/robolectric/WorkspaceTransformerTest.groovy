@@ -41,15 +41,22 @@ class WorkspaceTransformerTest extends GroovyTestCase {
         assertTrue(result.contains('<option name="Make" enabled="true"/>'));
     }
 
+    void testCreateWorkspaceWithJUnitDefaultsEnablesMakeIfItIsDisabled() {
+        testFile.text = getWorkspaceXmlWithExistingJUnitRunConfiguration("thename")
+
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]))
+
+        assertFalse(result.contains('<option name="Make" enabled="false"/>'));
+        assertTrue(result.contains('<option name="Make" enabled="true"/>'));
+    }
+
     void testCreateWorkspaceWithJUnitDoesNotCreateDuplicateRunConfigurations() {
         testFile.text = getWorkspaceXmlWithExistingJUnitRunConfiguration("DoMoreWork")
 
         String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]))
 
         assertTrue(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration" previous="true"/>'));
-        assertTrue(result.contains('<option name="Make" enabled="false"/>'));
         assertFalse(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration"/>'));
-        assertFalse(result.contains('<option name="Make" enabled="true"/>'));
     }
 
     static String getWorkspaceXml() {
