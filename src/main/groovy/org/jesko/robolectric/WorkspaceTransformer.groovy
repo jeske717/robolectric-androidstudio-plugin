@@ -1,6 +1,11 @@
 package org.jesko.robolectric
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 class WorkspaceTransformer {
+
+    static final Logger log = LoggerFactory.getLogger(WorkspaceTransformer)
 
     String createWorkspaceWithGradleTask(File file, GradleRunConfiguration gradleRunConfiguration) {
         def parsedXml = new XmlParser().parse(file)
@@ -24,7 +29,11 @@ class WorkspaceTransformer {
         def junitConfiguration = runManagerNode.configuration.find { it.attributes()['type'] == 'JUnit' && it.attributes()['default'] == 'true' }
 
         def vmParams = junitConfiguration.option.find { it.attributes()['name'] == 'VM_PARAMETERS' }
-        vmParams.attributes()['value'] = '-ea -classpath "' + classpathEntries.join(":") + ':$APPLICATION_HOME_DIR$/lib/idea_rt.jar:$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-rt.jar' + '"'
+        def intellijClasspath = ['$APPLICATION_HOME_DIR$/lib/idea_rt.jar', '$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-rt.jar']
+
+        def fullClasspath = classpathEntries
+        fullClasspath.addAll(intellijClasspath)
+        vmParams.attributes()['value'] = '-ea -classpath "' + fullClasspath.join(File.pathSeparator) + '"'
 
         def runBeforeNode = junitConfiguration.method[0]
         if(runBeforeNode.find{ it.attributes()['run_configuration_name'] == configuration.name} == null) {
