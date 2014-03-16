@@ -29,7 +29,7 @@ This is an example build script and workflow
 	}
 	
 	robolectric {
-		imlFile '<relative path to project.iml>'
+		imlFile '<relative path to the app project.iml>'
 		dotIdeaDir '<relative path to .idea folder>'
 	}
 	
