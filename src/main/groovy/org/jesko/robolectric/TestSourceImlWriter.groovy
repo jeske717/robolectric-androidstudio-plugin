@@ -21,8 +21,10 @@ class TestSourceImlWriter extends DefaultTask {
     @TaskAction
     def addRobolectricTestAsTestSourceRoot() {
         File file = getImlFile()
-        String newIml = imlTestEntryTransformer.createImlWithNewTestSourceRoot(file, "src/robolectricTest/java")
-        file.text = newIml
+		if(file.exists()) {
+			String newIml = imlTestEntryTransformer.createImlWithNewTestSourceRoot(file, "src/robolectricTest/java")
+			file.text = newIml
+		}
     }
 
     File getImlFile() {
