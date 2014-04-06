@@ -1,8 +1,5 @@
 package org.jesko.robolectric
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
 class WorkspaceTransformer {
 
     String createWorkspaceWithGradleTask(File file, GradleRunConfiguration gradleRunConfiguration) {
