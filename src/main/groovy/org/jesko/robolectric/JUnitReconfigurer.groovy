@@ -24,7 +24,7 @@ class JUnitReconfigurer extends DefaultTask {
         List robolectricClasses = robolectricClasspath.collect { it.absolutePath }
 
         File file = getWorkspaceXml()
-        GradleRunConfiguration configuration = new GradleRunConfiguration("BuildRobolectric", ["assembleDebug", "robolectricClasses"])
+        GradleRunConfiguration configuration = new GradleRunConfiguration("BuildRobolectric", ["compileDebugJava", "robolectricClasses"])
         String newWorkspaceXml = transformer.createWorkspaceWithGradleTask(file, configuration)
         file.text = newWorkspaceXml
         newWorkspaceXml = transformer.createWorkspaceWithJUnitDefaults(file, robolectricClasses, configuration)

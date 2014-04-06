@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory
 
 class WorkspaceTransformer {
 
-    static final Logger log = LoggerFactory.getLogger(WorkspaceTransformer)
-
     String createWorkspaceWithGradleTask(File file, GradleRunConfiguration gradleRunConfiguration) {
         def parsedXml = new XmlParser().parse(file)
         def runManagerNode = findRunManagerNode(parsedXml)
