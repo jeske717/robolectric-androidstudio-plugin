@@ -62,10 +62,6 @@ class RobolectricPlugin implements Plugin<Project> {
             robolectric.runtimeClasspath += project.fileTree(dir: it.value.explodedDir, include: '*.jar')
         }
 
-        androidPlugin.getRuntimeJarList().each {
-            robolectric.compileClasspath += project.files(it)
-            robolectric.runtimeClasspath += project.files(it)
-        }
     }
 
     private static void setupTest(final Project project) {
