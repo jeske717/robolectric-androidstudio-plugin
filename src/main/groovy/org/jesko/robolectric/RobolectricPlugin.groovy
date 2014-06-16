@@ -101,6 +101,7 @@ class RobolectricPlugin implements Plugin<Project> {
     private static void setupSourceSets(Project project) {
         SourceSet robolectric = project.getConvention().getPlugin(JavaPluginConvention).getSourceSets().create("robolectric")
         robolectric.java.srcDir(project.file("src/robolectricTest/java"))
+        robolectric.resources.srcDir(project.file("src/robolectricTest/resources"))
         robolectric.compileClasspath += project.configurations.robolectric
         robolectric.runtimeClasspath += robolectric.compileClasspath
     }
