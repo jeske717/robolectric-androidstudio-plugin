@@ -1,6 +1,6 @@
 robolectric-androidstudio-plugin
 ================================
-The goal of this project is to limit the amount of work necessary to use Robolectric with the gradle build system and Android Studio.  Tested on Mac/Windows using Android Studio 0.5.1, Gradle 1.11 and the android plugin for gradle version 0.9.0.
+The goal of this project is to limit the amount of work necessary to use Robolectric with the gradle build system and Android Studio.  Tested on Mac/Windows using Android Studio 0.8.0, Gradle 1.11 and the android plugin for gradle version 0.12.0.
 
 Example
 -------
