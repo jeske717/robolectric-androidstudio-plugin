@@ -45,7 +45,7 @@ class RobolectricPlugin implements Plugin<Project> {
 
         androidPlugin.mainSourceSet.java.srcDirs.each { dir ->
             def buildDir = dir.getAbsolutePath().split(Pattern.quote(File.separator))
-            buildDir = (buildDir[0..(buildDir.length - 4)] + ['build', 'classes', 'debug']).join(File.separator)
+            buildDir = (buildDir[0..(buildDir.length - 4)] + ['build', 'intermediates', 'classes', 'debug']).join(File.separator)
             robolectric.compileClasspath += project.files(buildDir)
             robolectric.runtimeClasspath += project.files(buildDir)
         }
