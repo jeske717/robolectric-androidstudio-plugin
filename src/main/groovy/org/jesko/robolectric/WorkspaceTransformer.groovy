@@ -18,7 +18,7 @@ class WorkspaceTransformer {
         return XmlUtil.writeXmlToString(parsedXml)
     }
 
-    String createWorkspaceWithJUnitDefaults(File file, List classpathEntries, GradleRunConfiguration configuration) {
+    String createWorkspaceWithJUnitDefaults(File file, List classpathEntries, GradleRunConfiguration configuration, boolean addMakeToDefault) {
         def parsedXml = new XmlParser().parse(file)
         def runManagerNode = findRunManagerNode(parsedXml)
         def junitConfiguration = runManagerNode.configuration.find { it.attributes()['type'] == 'JUnit' && it.attributes()['default'] == 'true' }
@@ -35,10 +35,11 @@ class WorkspaceTransformer {
             new Node(runBeforeNode, 'option', [name: 'RunConfigurationTask', enabled: 'true', run_configuration_name: configuration.name, run_configuration_type: 'GradleRunConfiguration'])
         }
 
-        new Node(runBeforeNode, 'option', [name: 'Make', enabled: 'true'])
-        def disabledMakeTask = runBeforeNode.find { it.attributes()['name'] == 'Make' && it.attributes()['enabled'] == 'false' }
-        if(disabledMakeTask != null) {
-           runBeforeNode.remove(disabledMakeTask)
+        def makeTask = runBeforeNode.find { it.attributes()['name'] == 'Make' }
+        if(makeTask == null) {
+            new Node(runBeforeNode, 'option', [name: 'Make', enabled: addMakeToDefault])
+        } else {
+            makeTask.attributes()['enabled'] = addMakeToDefault
         }
 
         return XmlUtil.writeXmlToString(parsedXml)

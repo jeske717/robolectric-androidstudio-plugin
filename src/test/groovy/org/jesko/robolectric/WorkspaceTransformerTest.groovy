@@ -34,7 +34,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaults() {
         testFile.text = getWorkspaceXml()
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]))
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
 
         assertTrue(result.contains('<option name="VM_PARAMETERS" value="-ea -classpath &quot;file1' + File.pathSeparator + 'file2' + File.pathSeparator + '$APPLICATION_HOME_DIR$/lib/idea_rt.jar' + File.pathSeparator + '$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-rt.jar&quot;"/>'));
         assertTrue(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration"/>'));
@@ -44,16 +44,49 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaultsEnablesMakeIfItIsDisabled() {
         testFile.text = getWorkspaceXmlWithExistingJUnitRunConfiguration("thename")
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]))
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
 
         assertFalse(result.contains('<option name="Make" enabled="false"/>'));
         assertTrue(result.contains('<option name="Make" enabled="true"/>'));
     }
 
+    void testCreateWorkspaceWithJUnitDefaultsOnlyAddsMakeIfItIsNotAlreadyAdded() {
+        testFile.text = getWorkspaceXmlWithMakeEnabledJUnitRunConfiguration("thename")
+
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
+
+        assertTrue(result.indexOf('<option name="Make" enabled="true"/>') == result.lastIndexOf('<option name="Make" enabled="true"/>'));
+    }
+
+    void testCreateWorkspaceWithJUnitDefaultsDoesNotAddMakeIfShouldAddMakeToDefaultIsFalse() {
+        testFile.text = getWorkspaceXml()
+
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false)
+
+        assertFalse(result.contains('<option name="Make" enabled="true"/>'));
+    }
+
+    void testCreateWorkspaceWithJUnitDefaultsDisablesMakeIfShouldAddMakeToDefaultIsFalse() {
+        testFile.text = getWorkspaceXmlWithMakeEnabledJUnitRunConfiguration("thename")
+
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false)
+
+        assertFalse(result.contains('<option name="Make" enabled="true"/>'));
+        assertTrue(result.contains('<option name="Make" enabled="false"/>'));
+    }
+
+    void testCreateWorkspaceWithJUnitDefaultsAddsDisabledMakeIfShouldAddMakeToDefaultIsFalse() {
+        testFile.text = getWorkspaceXml()
+
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false)
+
+        assertTrue(result.contains('<option name="Make" enabled="false"/>'));
+    }
+
     void testCreateWorkspaceWithJUnitDoesNotCreateDuplicateRunConfigurations() {
         testFile.text = getWorkspaceXmlWithExistingJUnitRunConfiguration("DoMoreWork")
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]))
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
 
         assertTrue(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration" previous="true"/>'));
         assertFalse(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration"/>'));
@@ -145,6 +178,54 @@ class WorkspaceTransformerTest extends GroovyTestCase {
                     <method>
                         <option name="RunConfigurationTask" enabled="true" run_configuration_name="$runConfigName" run_configuration_type="GradleRunConfiguration" previous="true"/>
                         <option name="Make" enabled="false"/>
+                    </method>
+                </configuration>
+            </component>
+        </project>
+        """
+    }
+
+    static String getWorkspaceXmlWithMakeEnabledJUnitRunConfiguration(String runConfigName) {
+        return """
+        <project>
+            <component name="AndroidLayouts">
+            </component>
+            <component name="RunManager">
+                <configuration default="true" type="GradleRunConfiguration">
+                    <ExternalSystemSettings>
+                        <option name="externalProjectPath" />
+                        <option name="externalSystemIdString" value="GRADLE" />
+                        <option name="scriptParameters" />
+                        <option name="taskDescriptions">
+                            <list />
+                        </option>
+                        <option name="taskNames">
+                            <list />
+                        </option>
+                        <option name="vmOptions" />
+                    </ExternalSystemSettings>
+                </configuration>
+                <configuration default="true" type="JUnit" factoryName="JUnit">
+                    <module name="" />
+                    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+                    <option name="ALTERNATIVE_JRE_PATH" value="" />
+                    <option name="PACKAGE_NAME" />
+                    <option name="MAIN_CLASS_NAME" value="" />
+                    <option name="METHOD_NAME" value="" />
+                    <option name="TEST_OBJECT" value="class" />
+                    <option name="VM_PARAMETERS" value="" />
+                    <option name="PARAMETERS" value="" />
+                    <option name="WORKING_DIRECTORY" value="file://\$PROJECT_DIR\$" />
+                    <option name="ENV_VARIABLES" />
+                    <option name="PASS_PARENT_ENVS" value="true" />
+                    <option name="TEST_SEARCH_SCOPE">
+                        <value defaultName="moduleWithDependencies" />
+                    </option>
+                    <envs />
+                    <patterns />
+                    <method>
+                        <option name="RunConfigurationTask" enabled="true" run_configuration_name="$runConfigName" run_configuration_type="GradleRunConfiguration" previous="true"/>
+                        <option name="Make" enabled="true"/>
                     </method>
                 </configuration>
             </component>

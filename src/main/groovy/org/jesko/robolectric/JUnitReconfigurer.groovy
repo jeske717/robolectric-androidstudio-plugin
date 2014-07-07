@@ -1,6 +1,8 @@
 package org.jesko.robolectric
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.TaskAction
 
 import javax.inject.Inject
@@ -27,9 +29,14 @@ class JUnitReconfigurer extends DefaultTask {
         GradleRunConfiguration configuration = new GradleRunConfiguration("BuildRobolectric", ["compileDebugJava", "robolectricClasses"])
         String newWorkspaceXml = transformer.createWorkspaceWithGradleTask(file, configuration)
         file.text = newWorkspaceXml
-        newWorkspaceXml = transformer.createWorkspaceWithJUnitDefaults(file, robolectricClasses, configuration)
+        Logger log = Logging.getLogger(getClass())
+        newWorkspaceXml = transformer.createWorkspaceWithJUnitDefaults(file, robolectricClasses, configuration, shouldAddMakeToJunitDefault())
 
         file.text = newWorkspaceXml
+    }
+
+    boolean shouldAddMakeToJunitDefault() {
+        project.extensions.findByName("robolectric").inProcessBuilds
     }
 
     File getWorkspaceXml() {
