@@ -31,6 +31,7 @@ This is an example build script and workflow
 	robolectric {
 		imlFile '<relative path to the app project.iml>'
 		dotIdeaDir '<relative path to .idea folder>'
+		inProcessBuilds = false // see note below
 	}
 	
 	// optional: the plugin provides this task to edit the project's .iml file, 
@@ -44,6 +45,10 @@ Once a project is setup (and anytime the dependencies change), you can reconfigu
 	./gradlew configureJUnitDefaultToUseRobolectricClasspath
 	
 After that task is run and Android Studio reloads the project, you should be able to run POJO unit tests (roblectric included) out of src/robolectricTest/java.  Android tests can still be added at src/androidTest/java.  If any kind of project configuration is changed (dependencies added), the task will need to be run again.  In addition, since Android Studio creates JUnit run configurations on the fly, you may need to clear out any JUnit configurations that it has previously created.
+
+Note about in process builds
+----------------------------
+Although the in-process build option in Android Studio should make typical builds go faster, the option has an unfortunate side-effect of not allowing custom gradle run configurations to complete when they are added to a JUnit configuration in the 'Before Launch' section.  Because of this, for a regular TDD workflow, it is recommended to turn that option OFF in Android Studio and to set the "inProcessBuilds" parameter to false.  Doing so will speed up builds for TDD cycles by not providing a 'Make' task to the JUnit configuration, which incurs the penalty of building a full .APK.  Instead, the plugin will only compile Java sources and any sources under the robolectricTest configuration.
 
 TODO
 ----
