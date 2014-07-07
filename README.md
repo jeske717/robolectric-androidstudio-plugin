@@ -38,7 +38,9 @@ This is an example build script and workflow
 	// which adds src/robolectricTest/java as a test source root.
 	// This configuration block makes that task run whenever Android Studio starts a build
 	gradle.projectsEvaluated {
-		preBuild.dependsOn(addRobolectricTestSourcesToIml)
+		generateDebugSources.doLast {
+			tasks['addRobolectricTestSourcesToIml'].execute()
+		}
 	}
 	
 Once a project is setup (and anytime the dependencies change), you can reconfigure Android Studio's JUnit defaults using the following command:
