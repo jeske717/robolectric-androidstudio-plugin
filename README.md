@@ -14,8 +14,8 @@ This is an example build script and workflow
 	        }
 		}
 		dependencies {
-			classpath 'org.jesko.robolectric:robolectric-androidstudio-plugin:1.0.0-SNAPSHOT'
-			classpath 'com.android.tools.build:gradle:0.9.0'
+			classpath 'org.jesko.robolectric:robolectric-androidstudio-plugin:1.1.0-SNAPSHOT'
+			classpath 'com.android.tools.build:gradle:0.12.+'
 		}
 	}
 	
