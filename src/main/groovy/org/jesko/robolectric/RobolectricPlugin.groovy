@@ -38,8 +38,10 @@ class RobolectricPlugin implements Plugin<Project> {
         JavaPluginConvention javaPlugin = project.getConvention().getPlugin(JavaPluginConvention)
         SourceSet robolectric = javaPlugin.getSourceSets().findByName("robolectric");
 
-        def androidPlugin = project.getPlugins().getPlugin(AppPlugin)
-        if(androidPlugin == null) {
+        def androidPlugin
+        if(project.getPlugins().hasPlugin(AppPlugin)) {
+            androidPlugin = project.getPlugins().getPlugin(AppPlugin)
+        } else {
             androidPlugin = project.getPlugins().getPlugin(LibraryPlugin)
         }
 
@@ -93,6 +95,9 @@ class RobolectricPlugin implements Plugin<Project> {
         project.getTasks().getByName(JavaBasePlugin.CHECK_TASK_NAME).dependsOn(test);
         test.setDescription("Runs the unit tests using robolectric.");
         test.setGroup(JavaBasePlugin.VERIFICATION_GROUP);
+        test.getSystemProperties().put("android.manifest", project.file("src/main/AndroidManifest.xml"))
+        test.getSystemProperties().put("android.resources", project.file("src/main/res"))
+        test.getSystemProperties().put("android.assets", project.file("src/main/assets"))
 
         test.dependsOn(project.getTasks().findByName('robolectricClasses'))
         test.dependsOn(project.getTasks().findByName('assemble'))

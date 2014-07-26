@@ -2,6 +2,7 @@ package org.jesko.robolectric
 
 class WorkspaceTransformerTest extends GroovyTestCase {
 
+    RobolectricParameters parameters
     WorkspaceTransformer transformer
     File testFile
 
@@ -9,6 +10,10 @@ class WorkspaceTransformerTest extends GroovyTestCase {
         transformer = new WorkspaceTransformer()
         testFile = File.createTempFile("WorkspaceTransformerTest", "xml")
         testFile.deleteOnExit()
+        parameters = new RobolectricParameters()
+        parameters.androidAssets = "assetsDir"
+        parameters.androidResources = "resDir"
+        parameters.androidManifest = "manifestFile"
     }
 
     void testCreateWorkspaceWithGradleTaskReturnsNewXmlWithGradleTask() {
@@ -34,9 +39,13 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaults() {
         testFile.text = getWorkspaceXml()
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true, parameters)
 
-        assertTrue(result.contains('<option name="VM_PARAMETERS" value="-ea -classpath &quot;file1' + File.pathSeparator + 'file2' + File.pathSeparator + '$APPLICATION_HOME_DIR$/lib/idea_rt.jar' + File.pathSeparator + '$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-rt.jar&quot;"/>'));
+        assertTrue(result.contains('<option name="VM_PARAMETERS" value="-ea -classpath &quot;file1' +
+                File.pathSeparator + 'file2' +
+                File.pathSeparator + '$APPLICATION_HOME_DIR$/lib/idea_rt.jar' +
+                File.pathSeparator + '$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-rt.jar&quot; ' +
+                "-Dandroid.manifest=$parameters.androidManifest -Dandroid.resources=$parameters.androidResources -Dandroid.assets=$parameters.androidAssets\"/>"));
         assertTrue(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration"/>'));
         assertTrue(result.contains('<option name="Make" enabled="true"/>'));
     }
@@ -44,7 +53,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaultsEnablesMakeIfItIsDisabled() {
         testFile.text = getWorkspaceXmlWithExistingJUnitRunConfiguration("thename")
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true, parameters)
 
         assertFalse(result.contains('<option name="Make" enabled="false"/>'));
         assertTrue(result.contains('<option name="Make" enabled="true"/>'));
@@ -53,7 +62,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaultsOnlyAddsMakeIfItIsNotAlreadyAdded() {
         testFile.text = getWorkspaceXmlWithMakeEnabledJUnitRunConfiguration("thename")
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true, parameters)
 
         assertTrue(result.indexOf('<option name="Make" enabled="true"/>') == result.lastIndexOf('<option name="Make" enabled="true"/>'));
     }
@@ -61,7 +70,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaultsDoesNotAddMakeIfShouldAddMakeToDefaultIsFalse() {
         testFile.text = getWorkspaceXml()
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false)
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false, parameters)
 
         assertFalse(result.contains('<option name="Make" enabled="true"/>'));
     }
@@ -69,7 +78,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaultsDisablesMakeIfShouldAddMakeToDefaultIsFalse() {
         testFile.text = getWorkspaceXmlWithMakeEnabledJUnitRunConfiguration("thename")
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false)
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false, parameters)
 
         assertFalse(result.contains('<option name="Make" enabled="true"/>'));
         assertTrue(result.contains('<option name="Make" enabled="false"/>'));
@@ -78,7 +87,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDefaultsAddsDisabledMakeIfShouldAddMakeToDefaultIsFalse() {
         testFile.text = getWorkspaceXml()
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false)
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), false, parameters)
 
         assertTrue(result.contains('<option name="Make" enabled="false"/>'));
     }
@@ -86,7 +95,7 @@ class WorkspaceTransformerTest extends GroovyTestCase {
     void testCreateWorkspaceWithJUnitDoesNotCreateDuplicateRunConfigurations() {
         testFile.text = getWorkspaceXmlWithExistingJUnitRunConfiguration("DoMoreWork")
 
-        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true)
+        String result = transformer.createWorkspaceWithJUnitDefaults(testFile, ["file1", "file2"], new GradleRunConfiguration("DoMoreWork", ["this first", "this second"]), true, parameters)
 
         assertTrue(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration" previous="true"/>'));
         assertFalse(result.contains('<option name="RunConfigurationTask" enabled="true" run_configuration_name="DoMoreWork" run_configuration_type="GradleRunConfiguration"/>'));

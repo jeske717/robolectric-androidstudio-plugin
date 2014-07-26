@@ -18,7 +18,7 @@ class WorkspaceTransformer {
         return XmlUtil.writeXmlToString(parsedXml)
     }
 
-    String createWorkspaceWithJUnitDefaults(File file, List classpathEntries, GradleRunConfiguration configuration, boolean addMakeToDefault) {
+    String createWorkspaceWithJUnitDefaults(File file, List classpathEntries, GradleRunConfiguration configuration, boolean addMakeToDefault, RobolectricParameters parameters) {
         def parsedXml = new XmlParser().parse(file)
         def runManagerNode = findRunManagerNode(parsedXml)
         def junitConfiguration = runManagerNode.configuration.find { it.attributes()['type'] == 'JUnit' && it.attributes()['default'] == 'true' }
@@ -28,7 +28,7 @@ class WorkspaceTransformer {
 
         def fullClasspath = classpathEntries
         fullClasspath.addAll(intellijClasspath)
-        vmParams.attributes()['value'] = '-ea -classpath "' + fullClasspath.join(File.pathSeparator) + '"'
+        vmParams.attributes()['value'] = "-ea -classpath \"${fullClasspath.join(File.pathSeparator)}\" ${getParameterString(parameters)}"
 
         def runBeforeNode = junitConfiguration.method[0]
         if(runBeforeNode.find{ it.attributes()['run_configuration_name'] == configuration.name} == null) {
@@ -43,6 +43,10 @@ class WorkspaceTransformer {
         }
 
         return XmlUtil.writeXmlToString(parsedXml)
+    }
+
+    String getParameterString(RobolectricParameters parameters) {
+        "-Dandroid.manifest=$parameters.androidManifest -Dandroid.resources=$parameters.androidResources -Dandroid.assets=$parameters.androidAssets"
     }
 
     static def findRunManagerNode(parsedXml) {

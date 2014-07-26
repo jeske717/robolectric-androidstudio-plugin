@@ -88,4 +88,16 @@ class RobolectricPluginTest extends GroovyTestCase {
 
         assertEquals(1, project.getTasksByName("configureJUnitDefaultToUseRobolectricClasspath", false).size())
     }
+
+    void testSystemPropertiesAreSetForRobolectricTestRunner() {
+        Project project = ProjectBuilder.builder().build()
+        project.apply plugin: AppPlugin
+
+        project.apply plugin: RobolectricPlugin
+
+        def props = project.getTasks().getByName("robolectricTest").getSystemProperties()
+        assertEquals(project.file("src/main/AndroidManifest.xml"), props.get("android.manifest"))
+        assertEquals(project.file("src/main/res"), props.get("android.resources"))
+        assertEquals(project.file("src/main/assets"), props.get("android.assets"))
+    }
 }
