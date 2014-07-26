@@ -1,13 +1,24 @@
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 group 'org.jesko.robolectric'
-version '1.1.0-SNAPSHOT'
+version '1.1.1'
 
 repositories {
     mavenCentral()
 }
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
+    }
+}
+
+apply plugin: 'com.jfrog.bintray'
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:1.8.6'
@@ -17,4 +28,58 @@ dependencies {
 
 task wrapper(type: Wrapper) {
     gradleVersion '1.11'
+}
+
+bintray {
+    user = bintrayUserName
+    key = bintrayApiKey
+    publish = true
+    publications = ['mavenJava']
+
+    pkg {
+        repo = 'android-utils'
+        name = 'robolectric-androidstudio-plugin'
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name 'The MIT License'
+            url 'http://www.opensource.org/licenses/mit-license.php'
+            distribution 'repo'
+        }
+    }
+    developers {
+        developer {
+            id "jeske717"
+            name "Ben Jeske"
+            email "jeske717@gmail.com"
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom.withXml {
+               def root = asNode()
+               root.children().last() + pomConfig 
+            }
+        }
+    }
 }
