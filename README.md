@@ -8,13 +8,10 @@ This is an example build script and workflow
 
 	buildscript {
 		repositories {
-			mavenCentral()
-	        maven {
-	            url '<wherever the plugin is installed to>'
-	        }
+			jcenter()
 		}
 		dependencies {
-			classpath 'org.jesko.robolectric:robolectric-androidstudio-plugin:1.1.0-SNAPSHOT'
+			classpath 'org.jesko.robolectric:robolectric-androidstudio-plugin:1.1.3'
 			classpath 'com.android.tools.build:gradle:0.12.+'
 		}
 	}
