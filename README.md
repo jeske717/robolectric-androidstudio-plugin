@@ -25,6 +25,12 @@ This is an example build script and workflow
 		robolectricCompile 'com.google.android:android:4.1.1.4'
 	}
 	
+	android {
+	    configurations {
+	        androidTestProvided.extendsFrom(robolectricCompile)
+	    }
+	}
+	
 	robolectric {
 		imlFile '<relative path to the app project.iml>'
 		dotIdeaDir '<relative path to .idea folder>'
