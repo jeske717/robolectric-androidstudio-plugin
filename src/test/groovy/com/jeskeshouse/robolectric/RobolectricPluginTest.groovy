@@ -1,8 +1,9 @@
 package com.jeskeshouse.robolectric
 
 import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.BasePlugin
 import org.gradle.api.Project
+import org.gradle.api.internal.plugins.PluginApplicationException
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
@@ -11,13 +12,13 @@ import org.gradle.testfixtures.ProjectBuilder
 class RobolectricPluginTest extends GroovyTestCase {
 
     void setUp() {
-        AppPlugin.TEST_SDK_DIR = new File(".")
+        BasePlugin.TEST_SDK_DIR = new File(".")
     }
 
-    void testApplyPluginThrowsIllegalStateExceptionWhenAndroidPluginNotApplied() {
+    void testApplyPluginThrowsPluginApplicationExceptionWhenAndroidPluginNotApplied() {
         Project project = ProjectBuilder.builder().build()
 
-        shouldFail(IllegalArgumentException.class) {
+        shouldFail(PluginApplicationException.class) {
             project.apply plugin: RobolectricPlugin
         }
     }
@@ -26,15 +27,6 @@ class RobolectricPluginTest extends GroovyTestCase {
         Project project = ProjectBuilder.builder().build()
 
         project.apply plugin: AppPlugin
-        project.apply plugin: RobolectricPlugin
-
-        assertEquals(1, project.getTasksByName("robolectricTest", false).size())
-    }
-
-    void testApplyPluginAddsRobolectricTaskToProjectWhenAndroidLibraryPluginApplied() {
-        Project project = ProjectBuilder.builder().build()
-
-        project.apply plugin: LibraryPlugin
         project.apply plugin: RobolectricPlugin
 
         assertEquals(1, project.getTasksByName("robolectricTest", false).size())
