@@ -1,4 +1,4 @@
-package org.jesko.robolectric
+package com.jeskeshouse.robolectric
 
 class GradleRunConfigurationTest extends GroovyTestCase {
 

@@ -1,4 +1,4 @@
-package org.jesko.robolectric
+package com.jeskeshouse.robolectric
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
