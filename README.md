@@ -1,6 +1,6 @@
 robolectric-androidstudio-plugin
 ================================
-The goal of this project is to limit the amount of work necessary to use Robolectric with the gradle build system and Android Studio.  Tested on Mac/Windows using Android Studio 0.8.0, Gradle 1.11 and the android plugin for gradle version 0.12.0.
+The goal of this project is to limit the amount of work necessary to use Robolectric with the gradle build system and Android Studio.  Tested on Mac/Windows using Android Studio 0.9.0, Gradle 2.1 and the android plugin for gradle version 0.14.0.
 
 Example
 -------
@@ -11,8 +11,8 @@ This is an example build script and workflow
 			jcenter()
 		}
 		dependencies {
-			classpath 'org.jesko.robolectric:robolectric-androidstudio-plugin:1.1.3'
-			classpath 'com.android.tools.build:gradle:0.12.+'
+			classpath 'com.jeskeshouse:robolectric-androidstudio-plugin:2.0.0'
+			classpath 'com.android.tools.build:gradle:0.14.0'
 		}
 	}
 	
