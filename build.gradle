@@ -4,7 +4,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group 'com.jeskeshouse'
-version '2.0.1-SNAPSHOT'
+version '2.0.0'
 
 repositories {
     mavenCentral()
@@ -39,7 +39,7 @@ bintray {
 
     pkg {
         repo = 'android-utils'
-        name = 'robolectric-androidstudio-plugin'
+        name = 'robolectric-androidstudio-pluginv2'
     }
 }
 
