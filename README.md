@@ -1,3 +1,14 @@
+DEPRECATED
+==========
+This plugin is no longer necessary to get standard JUnit tests running in Android Studio.  Starting with Android Gradle 1.1.0, unit testing support is a first class citizen.  To migrate away from this plugin and to the official gradle plugin, follow these steps:
+
+* Upgrade Android Gradle to 1.1.0-rc3
+* Rename src/robolectricTest/java to src/test/java
+* Redefine test depencencies from robolectricCompile to testCompile
+* Enable Unit Test support in android studio (File -> Settings -> Gradle -> Experimental, select the unit test support checkbox)
+* You may need to annotate robolectric tests with @Config(manifest = "src/main/AndroidManifest.xml") if robolectric is unable to locate the manifest
+* Command-line builds should start with a clean once the upgrade is complete, e.g. ./gradlew clean test or ./gradlew clean connectedAndroidTest
+
 robolectric-androidstudio-plugin
 ================================
 The goal of this project is to limit the amount of work necessary to use Robolectric with the gradle build system and Android Studio.  Tested on Mac/Windows using Android Studio 0.9.0, Gradle 2.1 and the android plugin for gradle version 0.14.0.
